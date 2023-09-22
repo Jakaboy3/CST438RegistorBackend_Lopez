@@ -1,5 +1,7 @@
 package com.cst438;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
@@ -74,17 +76,45 @@ public class JunitTestStudent{
         }
     }
     
-//    @Test
-//    public void deleteStudent() throws Exception{
-//    	MockHttpServletResponse response;
-//    	
-//    	response = mvc.perform(
-//                MockMvcRequestBuilders
-//    			.get("MockMvcRequestBuilders")
-//    			.accept(MediaType.APPLICATION_JSON))
-//    			.andReturn().getResponse();
-//    	dto_list = fromJsonString(response.getContentAsString(), StudentDTO[].class);
-//    	found = false;
-//    }
+    @Test
+    public void deleteStudent() throws Exception{
+    	MockHttpServletResponse response;
+    	
+    	response = mvc.perform(
+                MockMvcRequestBuilders
+    			.get("MockMvcRequestBuilders")
+    			.accept(MediaType.APPLICATION_JSON))
+    			.andReturn().getResponse();
+    	StudentDTO[] dto_list = fromJsonString(response.getContentAsString(), StudentDTO[].class);
+    	boolean found = false;
+    	for(StudentDTO dto : dto_list) {
+    		if(dto.student_id()==1) found=true;
+    	}
+    	assertTrue(found);
+    	
+    	response = mvc.perform(
+    			MockMvcRequestBuilders
+    			.delete("/student/1"))
+    			.andReturn().getResponse();
+    	
+    	dto_list = fromJsonString(response.getContentAsString(), StudentDTO[].class);
+    	found = false;
+    	for(StudentDTO dto : dto_list) {
+    		if(dto.student_id()==1) found=true;
+    	}
+    	assertFalse(found);
+    }
+	private static String asJsonString(final Object obj) {
+		try {
+			return new ObjectMapper().writeValueAsString(obj);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+    
+    
+    
+    
 
 }
