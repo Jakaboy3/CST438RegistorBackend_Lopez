@@ -31,7 +31,9 @@ public class GradebookServiceREST implements GradebookService {
 		System.out.println("Start Message "+ student_email +" " + course_id); 
 	
 		// TODO use RestTemplate to send message to gradebook service
-		
+		EnrollmentDTO s = new EnrollmentDTO(0, student_email, student_name, course_id);
+		RestTemplate restTemplate = new RestTemplate();
+		 restTemplate.postForObject( gradebook_url+ "/Enrollment",s,  EnrollmentDTO.class);
 	}
 	
 	@Autowired
@@ -41,9 +43,20 @@ public class GradebookServiceREST implements GradebookService {
 	 */
 	@PutMapping("/course/{course_id}")
 	@Transactional
-	public void updateCourseGrades( @RequestBody FinalGradeDTO[] grades, @PathVariable("course_id") int course_id) {
-		System.out.println("Grades received "+grades.length);
-		
-		//TODO update grades in enrollment records with grades received from gradebook service
+	public void updateCourseGrades(@RequestBody FinalGradeDTO[] grades, @PathVariable("course_id") int course_id) {
+	    System.out.println("Grades received " + grades.length);
+
+	    for (FinalGradeDTO gradeDTO : grades) {
+	        // Fetch Enrollment using studentEmail and courseId
+	        Enrollment en = enrollmentRepository.findByEmailAndCourseId(gradeDTO.studentEmail(), gradeDTO.courseId());
+	        
+	        if (en != null) {
+	            // Update the course grade
+	            en.setCourseGrade(gradeDTO.grade());
+	            enrollmentRepository.save(en);
+	        } else {
+	            System.out.println("No enrollment found for student " + gradeDTO.studentEmail() + " in course " + gradeDTO.courseId());
+	        }
+	    }
 	}
 }
