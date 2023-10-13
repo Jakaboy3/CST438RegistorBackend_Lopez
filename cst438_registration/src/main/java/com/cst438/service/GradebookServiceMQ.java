@@ -33,6 +33,9 @@ public class GradebookServiceMQ implements GradebookService {
 		System.out.println("Start Message "+ student_email +" " + course_id); 
 		// create EnrollmentDTO, convert to JSON string and send to gradebookQueue
 		// TODO
+		EnrollmentDTO s = new EnrollmentDTO(0,student_email, student_name, course_id);
+		String x = asJsonString(s);
+		rabbitTemplate.convertAndSend(gradebookQueue.getName(), x);
 	}
 	
 	@RabbitListener(queues = "registration-queue")
@@ -43,10 +46,26 @@ public class GradebookServiceMQ implements GradebookService {
 		 * for each student grade in courseDTOG,  find the student enrollment 
 		 * entity and update the grade.
 		 */
-		
+		//url=http://localhost:8081/enrollment
 		// deserialize the string message to FinalGradeDTO[] 
+		//FinalGradeDTO[] 
 		
+				
 		// TODO
+		FinalGradeDTO[] s = fromJsonString(message, FinalGradeDTO[].class);
+		for(FinalGradeDTO gradeDTO : s) {
+			String student_email = gradeDTO.studentEmail();
+			int course_id = gradeDTO.courseId();
+			
+			String grade = gradeDTO.grade();
+			Enrollment enroll = enrollmentRepository.findByEmailAndCourseId(student_email,course_id);
+			if(enroll == null) {
+				System.out.println("Nothing found");
+			}else {
+				enroll.setCourseGrade(grade);
+				enrollmentRepository.save(enroll);
+			}
+		}
 
 	}
 	
