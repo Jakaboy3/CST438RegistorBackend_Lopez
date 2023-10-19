@@ -31,9 +31,12 @@ public class GradebookServiceREST implements GradebookService {
 		System.out.println("Start Message "+ student_email +" " + course_id); 
 	
 		// TODO use RestTemplate to send message to gradebook service
-		EnrollmentDTO s = new EnrollmentDTO(0, student_email, student_name, course_id);
-		RestTemplate restTemplate = new RestTemplate();
-		 restTemplate.postForObject( gradebook_url+ "/Enrollment",s,  EnrollmentDTO.class);
+		EnrollmentDTO dto = new EnrollmentDTO(0, student_email, student_name, course_id);
+		EnrollmentDTO result = restTemplate.postForObject(gradebook_url + "/enrollment/", dto, EnrollmentDTO.class);
+		System.out.println("POST result " + result);
+		// EnrollmentDTO s = new EnrollmentDTO(0, student_email, student_name, course_id);
+		// RestTemplate restTemplate = new RestTemplate();
+		//  restTemplate.postForObject( gradebook_url+ "/Enrollment",s,  EnrollmentDTO.class);
 	}
 	
 	@Autowired
