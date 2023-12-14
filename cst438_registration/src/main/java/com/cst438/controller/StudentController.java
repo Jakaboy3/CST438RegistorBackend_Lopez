@@ -1,8 +1,11 @@
 package com.cst438.controller;
 
 import java.util.List;
-import java.util.Optional;
 
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,10 +29,19 @@ import com.cst438.domain.ScheduleDTO;
 import com.cst438.domain.Student;
 import com.cst438.domain.StudentRepository;
 import com.cst438.service.GradebookService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import static org.junit.jupiter.api.Assertions.*; 
+
 
 @RestController
 @CrossOrigin
 public class StudentController {
+	public static final String CHROME_DRIVER_FILE_LOCATION =
+            "C:/chromedriver_win32/chromedriver.exe";
+	public static final String URL = "http://localhost:3000";
+	public static final String ALIAS_NAME = "test";
+	public static final int SLEEP_DURATION = 1000;
 	@Autowired
 	CourseRepository courseRepository;
 	
@@ -84,6 +96,10 @@ public class StudentController {
     @DeleteMapping("/student/{student_id}")
     public void deleteStudent(@PathVariable("student_id") int student_id,
             @RequestParam("force") Optional<String> force) {
+//    	Student s = studentRepository.findById("id").orElse(null);
+//    	if(s != null) {
+//    		List<Enrollment> list = enrollmentRepository.findBy
+//    	}
         Student student = studentRepository.findById(student_id).orElseThrow(() -> 
             new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found"));
         boolean e = enrollmentRepository.findById(student_id).isEmpty();
@@ -101,8 +117,13 @@ public class StudentController {
 	// update course
     @PutMapping("/student/{student_id}")
     public void updateStudent(@RequestBody StudentDTO studentDTO, @PathVariable("student_id") int student_id) {
+//    	Student s = studentRepository.findById(student_id).orElse(null);
+//    	if(s==null) {
+//    		throw new RepositoryStatusException(HttpStatus.NOT_FOUND, "Student not found");
+//    	}
         Student student = studentRepository.findById(student_id).orElseThrow(() -> 
         new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found"));
+        
         student.setName(studentDTO.name());
         student.setEmail(studentDTO.email());
         student.setStatus(studentDTO.status());
@@ -130,5 +151,6 @@ public class StudentController {
 		return result;
 		
 	}
+	
 	
 }
