@@ -33,14 +33,9 @@ public class GradebookServiceMQ implements GradebookService {
 		System.out.println("Start Message "+ student_email +" " + course_id); 
 		// create EnrollmentDTO, convert to JSON string and send to gradebookQueue
 		// TODO
-		// EnrollmentDTO s = new EnrollmentDTO(0,student_email, student_name, course_id);
-		// String x = asJsonString(s);
-		// rabbitTemplate.convertAndSend(gradebookQueue.getName(), x);
-		EnrollmentDTO dto = new EnrollmentDTO(0, student_email, student_name, course_id);
-		String json = asJsonString(dto);
-		System.out.println(json);
-		rabbitTemplate.convertAndSend(gradebookQueue.getName(), json);
-		System.out.println("End Message");  	
+		EnrollmentDTO s = new EnrollmentDTO(0,student_email, student_name, course_id);
+		String x = asJsonString(s);
+		rabbitTemplate.convertAndSend(gradebookQueue.getName(), x);
 	}
 	
 	@RabbitListener(queues = "registration-queue")
@@ -57,27 +52,18 @@ public class GradebookServiceMQ implements GradebookService {
 		
 				
 		// TODO
-		// FinalGradeDTO[] s = fromJsonString(message, FinalGradeDTO[].class);
-		// for(FinalGradeDTO gradeDTO : s) {
-		// 	String student_email = gradeDTO.studentEmail();
-		// 	int course_id = gradeDTO.courseId();
+		FinalGradeDTO[] s = fromJsonString(message, FinalGradeDTO[].class);
+		for(FinalGradeDTO gradeDTO : s) {
+			String student_email = gradeDTO.studentEmail();
+			int course_id = gradeDTO.courseId();
 			
-		// 	String grade = gradeDTO.grade();
-		// 	Enrollment enroll = enrollmentRepository.findByEmailAndCourseId(student_email,course_id);
-		// 	if(enroll == null) {
-		// 		System.out.println("Nothing found");
-		// 	}else {
-		// 		enroll.setCourseGrade(grade);
-		// 		enrollmentRepository.save(enroll);
-		// 	}
-		// }
-		FinalGradeDTO[] grades = fromJsonString(message, FinalGradeDTO[].class);
-		System.out.println("Grades received "+grades.length);
-		for (FinalGradeDTO dto: grades) {
-			Enrollment enrollment = enrollmentRepository.findByEmailAndCourseId(dto.studentEmail(), dto.courseId());
-			if (enrollment != null) {
-				enrollment.setCourseGrade(dto.grade());
-				enrollmentRepository.save(enrollment);
+			String grade = gradeDTO.grade();
+			Enrollment enroll = enrollmentRepository.findByEmailAndCourseId(student_email,course_id);
+			if(enroll == null) {
+				System.out.println("Nothing found");
+			}else {
+				enroll.setCourseGrade(grade);
+				enrollmentRepository.save(enroll);
 			}
 		}
 
